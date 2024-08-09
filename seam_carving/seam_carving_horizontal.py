@@ -12,40 +12,42 @@ def calculate_energy(image):
     #Calculando o gradiente das imagens 
     energy = np.abs(filters.sobel_h(gray_image))
     return energy
-
+    
 
 def find_seam(energy):
-    #Energia acumulada ao longo do caminho minimo
+    # Energia acumulada ao longo do caminho mínimo
     r, c = energy.shape
     M = energy.copy()
     backtrack = np.zeros_like(M, dtype=int)
 
     # Preenchendo a matriz de energia acumulada
-    for i in range(1, r):
-        for j in range(c):
+    for j in range(1, c):  # Alterado para percorrer colunas
+        for i in range(r):
             # Bordas são tratadas separadamente
-            if j == 0:
-                idx = np.argmin(M[i-1, j:j+2])
-                backtrack[i, j] = idx + j
-                min_energy = M[i-1, idx + j]
+            if i == 0:
+                idx = np.argmin(M[i:i+2, j-1])
+                backtrack[i, j] = idx + i
+                min_energy = M[idx + i, j-1]
             else:
-                idx = np.argmin(M[i-1, j-1:j+2])
-                backtrack[i, j] = idx + j - 1
-                min_energy = M[i-1, idx + j - 1]
+                idx = np.argmin(M[i-1:i+2, j-1])
+                backtrack[i, j] = idx + i - 1
+                min_energy = M[idx + i - 1, j-1]
             M[i, j] += min_energy
 
     return M, backtrack
 
+
 def remove_seam(image, backtrack):
     r, c, _ = image.shape
-    output = np.zeros((r, c - 1, 3), dtype=image.dtype)
-    j = np.argmin(backtrack[-1])
-    for i in reversed(range(r)):
-        output[i, :, 0] = np.delete(image[i, :, 0], [j])
-        output[i, :, 1] = np.delete(image[i, :, 1], [j])
-        output[i, :, 2] = np.delete(image[i, :, 2], [j])
-        j = backtrack[i, j]
+    output = np.zeros((r - 1, c, 3), dtype=image.dtype)
+    i = np.argmin(backtrack[:, -1])
+    for j in reversed(range(c)):
+        output[:, j, 0] = np.delete(image[:, j, 0], [i])
+        output[:, j, 1] = np.delete(image[:, j, 1], [i])
+        output[:, j, 2] = np.delete(image[:, j, 2], [i])
+        i = backtrack[i, j]
     return output
+
 
 def seam_carving(image, num_seams):
     for _ in range(num_seams):
