@@ -9,4 +9,4 @@ Repositório com as atividades da disciplina de Visão Computacional do semestre
 - Lab 03 - ❌ A ser adicionada
 - RANSAC - ❌ A ser adicionada
 - Seam Carving Horizontal - ✅
-- Remoção de Objetos usando Seam Carving - ❌ A ser adicionada
+- Remoção de Objetos usando Seam Carving -  ✅
